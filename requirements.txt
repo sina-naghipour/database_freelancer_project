@@ -1,0 +1,7 @@
+pandas
+streamlit
+pymongo
+bson
+faker
+logging
+typing-extensions
