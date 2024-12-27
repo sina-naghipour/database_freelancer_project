@@ -23,14 +23,13 @@ class Notification:
         self.timestamp = timestamp or datetime.utcnow()
 
     def save_to_db(self, db):
-        """Save the Notification document to MongoDB."""
         notification_data = {
             "userId": self.userId,
             "type": self.type,
             "content": self.content,
             "link": self.link,
             "read": self.read,
-            "timestamp": self.timestamp  # Ensure it's a datetime object
+            "timestamp": self.timestamp
         }
         if self._id:
             db.update_one({"_id": self._id}, {"$set": notification_data})
@@ -40,13 +39,11 @@ class Notification:
 
     @classmethod
     def from_db(cls, db, _id: ObjectId):
-        """Retrieve a Notification document from MongoDB and create an instance."""
         data = db.find_one({"_id": _id})
         if data:
-            # Ensure timestamp is a datetime object, not a date
             timestamp = data.get("timestamp")
-            if isinstance(timestamp, date):  # If it's a datetime.date object
-                timestamp = datetime.combine(timestamp, datetime.min.time())  # Convert to datetime.datetime
+            if isinstance(timestamp, date):
+                timestamp = datetime.combine(timestamp, datetime.min.time())
             return cls(
                 _id=data["_id"],
                 userId=data.get("userId"),
@@ -59,19 +56,16 @@ class Notification:
         return None
 
     def mark_as_read(self, db):
-        """Mark the notification as read."""
         self.read = True
         self.save_to_db(db)
 
     def update(self, db, **kwargs):
-        """Update specific fields of the Notification document."""
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)
         self.save_to_db(db)
 
     def delete(self, db):
-        """Delete the Notification document from MongoDB."""
         if self._id:
             db.delete_one({"_id": self._id})
             self._id = None

@@ -1,17 +1,9 @@
 from pymongo import MongoClient
 
-# Prompt user for confirmation
-confirmation = input("Type 'delete_collections' to confirm deletion of collections: ")
-
-if confirmation == 'delete_collections':
+def delete_databases():
     try:
-        # Connect to the MongoDB server (adjust the URI if needed)
-        client = MongoClient("mongodb://localhost:27017/")  # Default MongoDB URI
-
-        # Access the FreelancerManagement database
+        client = MongoClient("mongodb://localhost:27017/")
         db = client["FreelancerManagement"]
-
-        # List of collections to drop based on the new schema
         collections_to_drop = [
             "Users",
             "Freelancers",
@@ -23,11 +15,8 @@ if confirmation == 'delete_collections':
             "Payments",
             "Categories"
         ]
-
-        # Check if database exists
         if db.name in client.list_database_names():
             print(f"Database '{db.name}' found. Proceeding to drop collections.")
-            # Drop each collection
             for collection_name in collections_to_drop:
                 if collection_name in db.list_collection_names():
                     try:
@@ -41,5 +30,3 @@ if confirmation == 'delete_collections':
             print(f"Database '{db.name}' does not exist.")
     except Exception as e:
         print(f"An error occurred: {e}")
-else:
-    print("Operation aborted. Collections were not deleted.")

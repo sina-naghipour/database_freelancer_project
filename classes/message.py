@@ -19,7 +19,6 @@ class Message:
         self.lastUpdated = lastUpdated or datetime.utcnow()
 
     def save_to_db(self, db):
-        """Save the Message document to MongoDB."""
         message_data = {
             "conversationId": self.conversationId,
             "participants": self.participants,
@@ -40,7 +39,6 @@ class Message:
 
     @classmethod
     def from_db(cls, db, _id: ObjectId):
-        """Retrieve a Message document from MongoDB and create an instance."""
         try:
             data = db.find_one({"_id": _id})
             if data:
@@ -59,7 +57,6 @@ class Message:
             raise RuntimeError(f"Failed to fetch message: {e}")
 
     def update(self, db, **kwargs):
-        """Update specific fields of the Message document."""
         try:
             for key, value in kwargs.items():
                 if hasattr(self, key):
@@ -72,7 +69,6 @@ class Message:
             raise RuntimeError(f"Failed to update message: {e}")
 
     def delete(self, db):
-        """Delete the Message document from MongoDB."""
         try:
             if self._id:
                 db.delete_one({"_id": self._id})
@@ -88,7 +84,6 @@ class Message:
         return f"Message(conversationId={self.conversationId}, participants={self.participants})"
 
     def add_reply(self, reply_to_message_id: ObjectId, reply_content: str, sender_id: ObjectId, db):
-        """Adds a reply to a specific message."""
         reply = {
             "senderId": sender_id,
             "content": reply_content,
@@ -101,19 +96,18 @@ class Message:
                 senderId=sender_id,
                 timestamp=datetime.utcnow()
             ).to_dict(),
-            "attachments": []  # Can be populated with attachments
+            "attachments": []
         }
         self.messages.append(reply)
         self.update(db, messages=self.messages)
 
     def forward_message(self, message_id: ObjectId, db):
-        """Forward a message by referencing the original message."""
         forwarded_message = {
-            "senderId": message_id,  # Assume senderId is taken from the original message
-            "content": "Forwarded message",  # You can customize the content as needed
+            "senderId": message_id,
+            "content": "Forwarded message",
             "timestamp": datetime.utcnow(),
             "forwardedFromMessageId": message_id,
-            "attachments": []  # Can include the forwarded message's attachments
+            "attachments": []
         }
         self.messages.append(forwarded_message)
         self.update(db, messages=self.messages)

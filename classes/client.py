@@ -9,7 +9,7 @@ class Client:
         self,
         _id: Optional[ObjectId] = None,
         user: Optional[ObjectId] = None,
-        email: Optional[str] = None,  # Added email field
+        email: Optional[str] = None,
         hiredFreelancers: Optional[List[ObjectId]] = None,
         reviewsGiven: Optional[List[Dict[str, str]]] = None,
         createdAt: Optional[datetime] = None,
@@ -17,17 +17,16 @@ class Client:
     ):
         self._id = _id
         self.user = user
-        self.email = email  # Initialize email
+        self.email = email
         self.hiredFreelancers = hiredFreelancers or []
         self.reviewsGiven = reviewsGiven or []
         self.createdAt = createdAt or datetime.utcnow()
         self.updatedAt = updatedAt or datetime.utcnow()
 
     def save_to_db(self, db):
-        """Save the Client document to MongoDB."""
         client_data = {
             "user": self.user,
-            "email": self.email,  # Save email to DB
+            "email": self.email,
             "hiredFreelancers": self.hiredFreelancers,
             "reviewsGiven": self.reviewsGiven,
             "createdAt": self.createdAt,
@@ -47,7 +46,6 @@ class Client:
 
     @classmethod
     def from_db(cls, db, _id: ObjectId):
-        """Retrieve a Client document from MongoDB and create an instance."""
         try:
             data = db.find_one({"_id": _id})
             if data:
@@ -55,7 +53,7 @@ class Client:
                 return cls(
                     _id=data["_id"],
                     user=data.get("user"),
-                    email=data.get("email"),  # Retrieve email from DB
+                    email=data.get("email"),
                     hiredFreelancers=data.get("hiredFreelancers", []),
                     reviewsGiven=data.get("reviewsGiven", []),
                     createdAt=data.get("createdAt"),
@@ -68,7 +66,6 @@ class Client:
             raise RuntimeError(f"Failed to fetch client: {e}")
 
     def update(self, db, **kwargs):
-        """Update specific fields of the Client document."""
         try:
             for key, value in kwargs.items():
                 if hasattr(self, key):
@@ -81,7 +78,6 @@ class Client:
             raise RuntimeError(f"Failed to update client: {e}")
 
     def delete(self, db):
-        """Delete the Client document from MongoDB."""
         try:
             if self._id:
                 db.delete_one({"_id": self._id})
