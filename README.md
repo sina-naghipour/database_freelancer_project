@@ -13,4 +13,6 @@
     After installing the dependencies, you can run the Streamlit application with the following command:
   ```bash
   python -m streamlit run main.py
+
+
 This will launch the Streamlit app in your browser.
